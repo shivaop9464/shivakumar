@@ -69,7 +69,7 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-24 px-4 relative max-w-7xl mx-auto-padding">
+    <section id="contact" className="py-24 px-4 relative max-w-7xl mx-auto">
       <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="text-center mb-16 max-w-7xl mx-auto">

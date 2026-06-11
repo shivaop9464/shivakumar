@@ -9,6 +9,16 @@ import { Search, ExternalLink, Github, Star, X, LayoutGrid, Calendar, ChevronRig
 import { usePortfolio } from '../context/PortfolioContext';
 import { Project } from '../types';
 
+const ensureExternalUrl = (url: string) => {
+  if (!url) return '#';
+  const trimmed = url.trim();
+  if (trimmed === '#' || trimmed === '') return '#';
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};
+
 export const Projects: React.FC = () => {
   const { projects } = usePortfolio();
   
@@ -16,6 +26,24 @@ export const Projects: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [iframeNotice, setIframeNotice] = useState<string | null>(null);
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    const trimmed = url ? url.trim() : '#';
+    if (trimmed === '#' || trimmed === '') {
+      e.preventDefault();
+      setIframeNotice("Notice: This project does not have an active live demo link or source code configured yet.");
+      setTimeout(() => setIframeNotice(null), 4000);
+      return;
+    }
+
+    // Since standard workspace preview frames strictly block external popups, we display a helpful non-blocking notice.
+    const isIframe = typeof window !== 'undefined' && window.self !== window.top;
+    if (isIframe) {
+      setIframeNotice(`ℹ️ Opening "${trimmed}"... (Note: If your browser blocks popups inside this secure editor view, please click the "Open preview" or "New Tab" button in the top-right corner to open the app standalone!)`);
+      setTimeout(() => setIframeNotice(null), 8000);
+    }
+  };
 
   const categories = ['All', 'AI Applications', 'SaaS Products', 'Full-Stack Apps', 'Automation Systems'];
 
@@ -190,7 +218,7 @@ export const Projects: React.FC = () => {
       {/* High Fidelity Modal Details View */}
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-1000 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="fixed inset-0 z-1000 flex items-start justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto py-8 sm:py-16 sm:items-center">
             <motion.div
               id="project-modal"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -267,23 +295,59 @@ export const Projects: React.FC = () => {
                 </div>
 
                 {/* Redirect Anchors */}
-                <div className="flex items-center gap-4 pt-2">
-                  <a
-                    href={selectedProject.liveUrl}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs font-semibold shadow-md transition-all transform active:translate-y-0.5"
-                    id="project-modal-live-link"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    <span>View Launch Site</span>
-                  </a>
-                  <a
-                    href={selectedProject.githubUrl}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg glass-card text-white hover:bg-white/5 dark:text-white light:bg-white/90 light:text-zinc-800 light:border-zinc-200 bg-zinc-900 border-white/10 text-xs font-semibold shadow-md transition-all transform active:translate-y-0.5"
-                    id="project-modal-git-link"
-                  >
-                    <Github className="w-4 h-4" />
-                    <span>Browse Source Code</span>
-                  </a>
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center gap-4">
+                    <a
+                      href={ensureExternalUrl(selectedProject.liveUrl)}
+                      onClick={(e) => handleLinkClick(e, selectedProject.liveUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-semibold shadow-md transition-all transform active:translate-y-0.5 ${
+                        selectedProject.liveUrl && selectedProject.liveUrl.trim() !== '' && selectedProject.liveUrl.trim() !== '#'
+                          ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold'
+                          : 'bg-zinc-900 border border-white/5 text-slate-500 cursor-not-allowed opacity-70'
+                      }`}
+                      id="project-modal-live-link"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>
+                        {selectedProject.liveUrl && selectedProject.liveUrl.trim() !== '' && selectedProject.liveUrl.trim() !== '#'
+                          ? 'View Launch Site'
+                          : 'Live Demo Offline'}
+                      </span>
+                    </a>
+                    <a
+                      href={ensureExternalUrl(selectedProject.githubUrl)}
+                      onClick={(e) => handleLinkClick(e, selectedProject.githubUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg border text-xs font-semibold shadow-md transition-all transform active:translate-y-0.5 ${
+                        selectedProject.githubUrl && selectedProject.githubUrl.trim() !== '' && selectedProject.githubUrl.trim() !== '#'
+                          ? 'glass-card text-white hover:bg-white/5 dark:text-white light:bg-white/90 light:text-zinc-800 light:border-zinc-200 bg-zinc-900 border-white/10'
+                          : 'bg-zinc-900 border-white/5 text-slate-500 cursor-not-allowed opacity-70'
+                      }`}
+                      id="project-modal-git-link"
+                    >
+                      <Github className="w-4 h-4" />
+                      <span>
+                        {selectedProject.githubUrl && selectedProject.githubUrl.trim() !== '' && selectedProject.githubUrl.trim() !== '#'
+                          ? 'Browse Source Code'
+                          : 'Private Repository'}
+                      </span>
+                    </a>
+                  </div>
+
+                  {iframeNotice && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.98, y: 5 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.98, y: 5 }}
+                      className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/15 text-purple-300 text-[11px] font-mono leading-relaxed"
+                      id="project-redirect-notice"
+                    >
+                      {iframeNotice}
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </motion.div>

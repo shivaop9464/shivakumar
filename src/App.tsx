@@ -80,8 +80,9 @@ const Header: React.FC<{ activeRoute: string; onRoute: (hash: string) => void }>
             <Cpu className="w-4 h-4 transition-transform group-hover:rotate-180 duration-500" />
           </span>
           <div>
-            <span className="text-sm font-bold font-display text-white dark:text-white light:text-zinc-950 block tracking-tight">
-              Shivakumar Kadaverugu
+            <span className="text-xs sm:text-sm font-bold font-display text-white dark:text-white light:text-zinc-950 block tracking-tight">
+              <span className="inline sm:hidden">Shivakumar K.</span>
+              <span className="hidden sm:inline">Shivakumar Kadaverugu</span>
             </span>
             <span className="text-[9px] font-mono text-purple-400 block tracking-wider uppercase">
               Full-Stack AI Builder
@@ -198,7 +199,7 @@ const PortfolioAppMain: React.FC = () => {
   const isAdmin = route === '#admin';
 
   return (
-    <div className="min-h-screen relative dark:bg-[#060608] light:bg-[#f9fafb] text-slate-300 dark:text-slate-350 light:text-zinc-800 transition-colors duration-300">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden relative dark:bg-[#060608] light:bg-[#f9fafb] text-slate-300 dark:text-slate-350 light:text-zinc-800 transition-colors duration-300">
       
       {/* 2. Scroll Progress bar stuck at header limit */}
       {!isAdmin && (
