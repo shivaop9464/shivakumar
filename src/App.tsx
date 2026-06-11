@@ -80,9 +80,8 @@ const Header: React.FC<{ activeRoute: string; onRoute: (hash: string) => void }>
             <Cpu className="w-4 h-4 transition-transform group-hover:rotate-180 duration-500" />
           </span>
           <div>
-            <span className="text-xs sm:text-sm font-bold font-display text-white dark:text-white light:text-zinc-950 block tracking-tight">
-              <span className="inline sm:hidden">Shivakumar K.</span>
-              <span className="hidden sm:inline">Shivakumar Kadaverugu</span>
+            <span className="text-[11px] xs:text-xs sm:text-sm font-bold font-display text-white dark:text-white light:text-zinc-950 block tracking-tight whitespace-nowrap">
+              Shivakumar Kadaverugu
             </span>
             <span className="text-[9px] font-mono text-purple-400 block tracking-wider uppercase">
               Full-Stack AI Builder
